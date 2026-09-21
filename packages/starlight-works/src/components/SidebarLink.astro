@@ -1,0 +1,19 @@
+---
+import { Badge } from '@astrojs/starlight/components';
+import type { StarlightRouteData } from '@astrojs/starlight/route-data';
+import { CATEGORY_MARKER } from '../sidebar.js';
+type Link = Extract<StarlightRouteData['sidebar'][number], { type: 'link' }>;
+interface Props { entry: Link; category?: boolean }
+const { entry, category = false } = Astro.props;
+const { [CATEGORY_MARKER]: _marker, class: className, ...attrs } = entry.attrs;
+---
+<a
+  {...attrs}
+  class:list={['slw-link', className, { 'slw-category-link': category }]}
+  href={entry.href}
+  aria-current={entry.isCurrent ? 'page' : undefined}
+  data-slw-category-link={category || undefined}
+>
+  <span class="slw-link-label">{entry.label}</span>
+  {entry.badge && <Badge {...entry.badge} />}
+</a>

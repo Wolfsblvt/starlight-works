@@ -1,0 +1,11 @@
+---
+import MobileMenuFooter from 'virtual:starlight/components/MobileMenuFooter';
+import SidebarList from './SidebarList.astro';
+const { sidebar } = Astro.locals.starlightRoute;
+---
+<div class="slw-sidebar" data-slw-sidebar>
+  <SidebarList entries={sidebar} path="slw" />
+</div>
+<div class="md:sl-hidden">
+  <MobileMenuFooter />
+</div>

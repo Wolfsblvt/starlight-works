@@ -1,0 +1,30 @@
+---
+import { Badge } from '@astrojs/starlight/components';
+import type { StarlightRouteData } from '@astrojs/starlight/route-data';
+import { groupView } from '../sidebar.js';
+import SidebarLink from './SidebarLink.astro';
+interface Props { entries: StarlightRouteData['sidebar']; path: string }
+const { entries, path } = Astro.props;
+---
+<ul class="slw-list">
+  {entries.map((entry, index) => {
+    const id = `${path}-${index}`;
+    if (entry.type === 'link') return <li><SidebarLink entry={entry} /></li>;
+    const view = groupView(entry);
+    return (
+      <li>
+        <div class:list={['slw-group', { 'slw-group--linked': !!view.category }]} data-slw-group={entry.label}>
+          {view.category && <div class="slw-group-heading"><SidebarLink entry={view.category} category /></div>}
+          <details open={view.open}>
+            <summary aria-label={`Toggle ${entry.label}`} aria-controls={`${id}-children`}>
+              {view.category ? <span class="slw-sr-only">{entry.label}</span> : <span class="slw-group-label">{entry.label} {entry.badge && <Badge {...entry.badge} />}</span>}
+            </summary>
+            <div class="slw-group-panel" id={`${id}-children`}>
+              <Astro.self entries={view.entries} path={id} />
+            </div>
+          </details>
+        </div>
+      </li>
+    );
+  })}
+</ul>

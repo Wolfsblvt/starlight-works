@@ -1,0 +1,7 @@
+node_modules/
+.astro/
+dist/
+artifacts/
+packages/starlight-works/LICENSE
+*.tgz
+.DS_Store

@@ -1,0 +1,6 @@
+:root {
+  --slw-alert-radius: 0.5rem;
+  --slw-alert-padding: 1.1rem;
+}
+/* The fixture changes spacing, not product colors or typography. */
+.slw-sidebar { --slw-sidebar-indent: 0.85rem; }
