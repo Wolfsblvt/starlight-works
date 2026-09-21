@@ -10,12 +10,19 @@ const labels = resolveAlertLabels();
 const parse = (text) => unified().use(remarkParse).parse(text);
 const render = async (text, custom = labels) => String(await unified().use(remarkParse).use(remarkGithubAlerts, custom).use(remarkRehype).use(rehypeStringify).process(text));
 
+function assertHiddenTitle(html) {
+  const titleTag = html.match(/<p\b[^>]*class="slw-alert__title"[^>]*>/)?.[0];
+  assert.ok(titleTag);
+  assert.match(titleTag, /aria-hidden="true"/);
+}
+
 for (const type of alertTypes) {
   test(`${type} retains its own semantic type and accessible visible label`, async () => {
     const html = await render(`> [!${type}]\n> Context.`);
     assert.match(html, new RegExp(`data-slw-alert="${type}"`));
     assert.match(html, new RegExp(`aria-label="${labels[type]}"`));
-    assert.match(html, new RegExp(`class="slw-alert__title">${labels[type]}</p>`));
+    assertHiddenTitle(html);
+    assert.match(html, new RegExp(`${labels[type]}</p>`));
     assert.match(html, /<p>Context\.<\/p>/);
     assert.doesNotMatch(html, /role="alert"/);
   });
@@ -25,6 +32,7 @@ test('a first standalone bold title is preserved alongside—not instead of—th
   for (const gap of ['\n> ', '\n>\n> ']) {
     const html = await render(`> [!NOTE]${gap}**In development**\n> Read [the guide](/guide/).`);
     assert.match(html, /aria-label="Note — In development"/);
+    assertHiddenTitle(html);
     assert.match(html, /Note — <strong>In development<\/strong>/);
     assert.match(html, /<a href="\/guide\/">the guide<\/a>/);
   }

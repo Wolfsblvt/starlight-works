@@ -7,7 +7,7 @@ const disclosure = (page, label) => details(page, label).locator(':scope > summa
 const reference = 'Reference with a deliberately long category label';
 async function menu(page) {
   if (await page.locator('[data-slw-sidebar]').isVisible()) return;
-  await page.getByRole('button', { name: /menu/i }).click();
+  await page.getByRole('button', { name: /menu|menü/i }).click();
   await expect(page.locator('[data-slw-sidebar]')).toBeVisible();
 }
 async function open(page, path = './') { await page.goto(path); await menu(page); }
@@ -17,6 +17,14 @@ async function expectOpen(page, label, value) {
 
 // Playwright's ARIA-only snapshot does not include Chromium's native DisclosureTriangle.
 // Read the actual accessibility node rather than changing production semantics to fit a test.
+function accessibilityNode(node) {
+  return {
+    role: node.role?.value,
+    name: node.name?.value,
+    properties: Object.fromEntries((node.properties ?? []).map((property) => [property.name, property.value.value])),
+  };
+}
+
 async function nativeDisclosure(page, label) {
   const session = await page.context().newCDPSession(page);
   try {
@@ -29,11 +37,30 @@ async function nativeDisclosure(page, label) {
     const { nodes } = await session.send('Accessibility.getPartialAXTree', { nodeId, fetchRelatives: false });
     const node = nodes.find((value) => !value.ignored);
     expect(node).toBeDefined();
-    return {
-      role: node.role?.value,
-      name: node.name?.value,
-      properties: Object.fromEntries((node.properties ?? []).map((property) => [property.name, property.value.value])),
+    return accessibilityNode(node);
+  } finally { await session.detach(); }
+}
+
+async function nativeAccessibilitySubtree(page, selector) {
+  const session = await page.context().newCDPSession(page);
+  try {
+    const { root } = await session.send('DOM.getDocument');
+    const { nodeId } = await session.send('DOM.querySelector', { nodeId: root.nodeId, selector });
+    expect(nodeId).not.toBe(0);
+    const { node } = await session.send('DOM.describeNode', { nodeId });
+    const { nodes } = await session.send('Accessibility.getFullAXTree');
+    const byId = new Map(nodes.map((value) => [value.nodeId, value]));
+    const target = nodes.find((value) => !value.ignored && value.backendDOMNodeId === node.backendNodeId);
+    expect(target).toBeDefined();
+    const result = [];
+    const visit = (id) => {
+      const current = byId.get(id);
+      if (!current) return;
+      if (!current.ignored) result.push(accessibilityNode(current));
+      for (const childId of current.childIds ?? []) visit(childId);
     };
+    visit(target.nodeId);
+    return result;
   } finally { await session.detach(); }
 }
 
@@ -87,13 +114,30 @@ test('keyboard disclosure and link focus are distinct, with a native expanded st
   await page.keyboard.press('Space');
   await expectOpen(page, 'Guide', false);
   const collapsed = await nativeDisclosure(page, 'Guide');
-  expect(collapsed).toMatchObject({ role: 'DisclosureTriangle', name: 'Toggle Guide', properties: { expanded: false, focusable: true } });
+  expect(collapsed).toMatchObject({ role: 'DisclosureTriangle', name: 'Guide', properties: { expanded: false, focusable: true } });
   await page.keyboard.press('Enter');
   await expectOpen(page, 'Guide', true);
   const expanded = await nativeDisclosure(page, 'Guide');
-  expect(expanded).toMatchObject({ role: 'DisclosureTriangle', name: 'Toggle Guide', properties: { expanded: true, focusable: true, controls: 'slw-1-children' } });
+  expect(expanded).toMatchObject({ role: 'DisclosureTriangle', name: 'Guide', properties: { expanded: true, focusable: true, controls: 'slw-1-children' } });
   expect(page.url()).toBe(initial);
   await testInfo.attach('native-disclosure-accessibility', { body: JSON.stringify({ collapsed, expanded }, null, 2), contentType: 'application/json' });
+});
+
+test('translated route data names linked disclosures without an English action word', async ({ page }, testInfo) => {
+  await open(page, './de/');
+  await expect(page.locator('html')).toHaveAttribute('lang', 'de');
+  await expectOpen(page, 'Handbuch', true);
+  await expect(byGroup(page, 'Handbuch').locator(':scope > .slw-group-heading a')).toHaveText('Handbuch');
+  const disclosureNode = await nativeDisclosure(page, 'Handbuch');
+  expect(disclosureNode).toMatchObject({
+    role: 'DisclosureTriangle',
+    name: 'Handbuch',
+    properties: { expanded: true, focusable: true },
+  });
+  await testInfo.attach('translated-disclosure-accessibility', {
+    body: JSON.stringify(disclosureNode, null, 2),
+    contentType: 'application/json',
+  });
 });
 
 test('five alert types retain labels, authored titles and rich Markdown beside normal quotes', async ({ page }) => {
@@ -103,6 +147,7 @@ test('five alert types retain labels, authored titles and rich Markdown beside n
     await expect(alert).toHaveCount(1);
     await expect(alert).toHaveAttribute('class', new RegExp(`slw-alert--${type.toLowerCase()}`));
     await expect(alert.locator('.slw-alert__title')).toContainText(type[0] + type.slice(1).toLowerCase());
+    await expect(alert.locator('.slw-alert__title')).toHaveAttribute('aria-hidden', 'true');
   }
   const note = page.locator('[data-slw-alert="NOTE"]');
   await expect(note).toHaveAttribute('aria-label', 'Note — In development');
@@ -116,6 +161,27 @@ test('five alert types retain labels, authored titles and rich Markdown beside n
   await expect(page.locator('blockquote').filter({ hasText: '[!UNKNOWN]' })).toHaveCount(1);
   await expect(page.locator('.starlight-aside')).toContainText('The native Starlight aside still works');
   await expect(page.locator('[data-slw-alert][role="alert"]')).toHaveCount(0);
+});
+
+test('alert captions name landmarks once without duplicate accessible text', async ({ page }, testInfo) => {
+  await page.goto('./');
+  const evidence = {};
+  for (const specimen of [
+    { type: 'NOTE', name: 'Note — In development', hiddenFragments: ['Note', 'In development'] },
+    { type: 'CAUTION', name: 'Caution', hiddenFragments: ['Caution'] },
+  ]) {
+    const tree = await nativeAccessibilitySubtree(page, `[data-slw-alert="${specimen.type}"]`);
+    expect(tree[0]).toMatchObject({ role: 'complementary', name: specimen.name });
+    const descendants = tree.slice(1).map((node) => node.name).filter(Boolean);
+    for (const fragment of specimen.hiddenFragments) {
+      expect(descendants.some((name) => name.includes(fragment))).toBe(false);
+    }
+    evidence[specimen.type] = tree;
+  }
+  await testInfo.attach('alert-accessibility-subtrees', {
+    body: JSON.stringify(evidence, null, 2),
+    contentType: 'application/json',
+  });
 });
 
 test('MDX alerts keep the fifth meaning and embedded elements', async ({ page }) => {
@@ -146,7 +212,7 @@ test('wrapped labels do not overlap disclosures or overflow the sidebar in eithe
     await expect(page.locator('html')).toHaveAttribute('data-theme', value);
     await page.screenshot({ path: `artifacts/screenshots/${testInfo.project.name}-${value}.png`, fullPage: !mobile });
     if (mobile) {
-      await page.getByRole('button', { name: /menu/i }).click();
+      await page.getByRole('button', { name: /menu|menü/i }).click();
       await expect(page.locator('[data-slw-sidebar]')).not.toBeVisible();
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth + 1)).toBe(true);
       await page.screenshot({ path: `artifacts/screenshots/mobile-content-${value}.png`, fullPage: true });

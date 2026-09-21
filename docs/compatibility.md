@@ -28,13 +28,13 @@ The workflow's `Tests` aggregate succeeds only when every specimen succeeds. The
 
 The run records its checked-out commit, Node/npm versions, selected consumer versions/licenses, generated dependency locks, npm pack account, browser results and selected desktop/mobile light/dark screenshots. The pack test compares two tarballs byte-for-byte and asserts complete exports, the license and the absence of development files.
 
-Browser checks cover distinct anchors and disclosures, keyboard activation and native expanded state, multiple open groups, current ancestors, native link attributes/autogeneration, all five alert meanings, authored titles, rich Markdown, MDX, theme changes and narrow-width overlap/overflow. The no-JavaScript case exercises native navigation/disclosure at a desktop viewport; Starlight's mobile shell retains its own script requirements.
+Browser checks cover distinct anchors and disclosures, keyboard activation and native expanded state, multiple open groups, current ancestors, localized route-data labels naming disclosures without a hard-coded action word, native link attributes/autogeneration, all five alert meanings, authored titles, alert landmarks without duplicated accessible captions, rich Markdown, MDX, theme changes and narrow-width overlap/overflow. The no-JavaScript case exercises native navigation/disclosure at a desktop viewport; Starlight's mobile shell retains its own script requirements.
 
 Artifacts are generated evidence with finite provider retention. A screenshot documents one rendered state; the interaction test documents an exercised path. Neither is a substitute for the other. The repository currently captures installation locks in those artifacts rather than committing a frozen installation graph. Repeating a fresh install later can select different transitive versions; do not confuse a declared peer range with a guaranteed byte-identical future environment.
 
 ## Material limits
 
-Manual assistive-technology use, Firefox/WebKit, real phones, Windows/macOS host execution, RTL/multilingual route matrices, server-rendered deployment adapters, arbitrary third-party Sidebar overrides, custom Markdown processors, altered consumer themes and future host versions are not blanket-qualified by this fixture. Build-wide alert label overrides are supported; automatic per-page locale label selection is not implemented.
+Manual assistive-technology use, Firefox/WebKit, real phones, Windows/macOS host execution, broad RTL/multilingual route matrices, server-rendered deployment adapters, arbitrary third-party Sidebar overrides, custom Markdown processors, altered consumer themes and future host versions are not blanket-qualified by this fixture. The fixture exercises one German route-data translation; that evidence does not claim universal locale coverage. Build-wide alert label overrides are supported; automatic per-page locale label selection is not implemented.
 
 No npm publication, registry installation of this package, deployed documentation site, independent review or release acceptance follows from a passing local/CI tarball. The source contribution retains those boundaries explicitly.
 

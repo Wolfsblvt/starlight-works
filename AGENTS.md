@@ -14,18 +14,22 @@ Keep the public API in `packages/starlight-works`; never add a product's routes,
 
 This repository belongs permanently to the Leitsatz estate. Standing Leitsatz seats may author and place Work here under the repository contract and an exact current grant; ownership alone grants no particular integration, publication, deployment or settings effect.
 
-`main` is the durable integration line and intended GitHub default branch. The package is source-available but remains unpublished until a separately authorized npm release.
+`main` is the durable integration line and GitHub default branch. The package is source-available but remains unpublished until a separately authorized npm release.
 
 ```text
 main:
   maintainer integration: direct allowed
   external contributions: PR required
-  required pre-integration evidence: none
-  required approval/review: none
+  fixed repository-wide evidence gate: none
+  evidence selection: per Work, changed behavior and consequence
+  default required approval/review: none
+  review selection: per Work, impact and current authority
   resolved conversations: no
   automatic CI: Verification
   automatic retained branch effects: none
   other pre-update evidence: current attributable integration authority
 ```
+
+These defaults do not waive evidence or review for a particular contribution. The current Work, changed behavior, retained boundaries and applicable authority determine what that candidate needs before integration.
 
 There is no npm release, tag, deployment, credential, telemetry or hosted-service operation in this repository's ordinary commands. Publishing, release and provider configuration require their own authority.
