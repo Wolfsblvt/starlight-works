@@ -1,0 +1,94 @@
+name: Verification
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: Verify (${{ matrix.name }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: floor-satteri
+            node: 22
+            astro: 7.2.10
+            processor: satteri
+            base: /manual/
+          - name: current-satteri
+            node: 24
+            astro: 7.3.3
+            processor: satteri
+            base: /
+          - name: current-unified
+            node: 24
+            astro: 7.3.3
+            processor: unified
+            base: /manual/
+    env:
+      WORKS_ASTRO: ${{ matrix.astro }}
+      WORKS_STARLIGHT: 0.42.2
+      WORKS_PROCESSOR: ${{ matrix.processor }}
+      WORKS_BASE: ${{ matrix.base }}
+      ASTRO_TELEMETRY_DISABLED: 1
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
+        with:
+          node-version: ${{ matrix.node }}
+          package-manager-cache: false
+      - name: Install repository dependencies
+        run: |
+          if [ -f package-lock.json ]; then npm ci --no-audit --no-fund; else npm install --no-audit --no-fund; fi
+      - name: Ordinary repository verification
+        run: npm test
+      - name: Check Astro components
+        run: npm run check
+      - name: Install, type-check and build the packed consumer
+        run: npm run test:consumer
+      - name: Install the exercised browser
+        run: npx playwright install --with-deps chromium
+      - name: Browser interactions
+        run: npm run test:browser
+      - name: Preserve source and qualification coordinates
+        if: always()
+        run: |
+          mkdir -p artifacts
+          git rev-parse HEAD > artifacts/source-commit.txt
+          git archive --format=zip --output=artifacts/source.zip HEAD
+          node --version > artifacts/node-version.txt
+          npm --version > artifacts/npm-version.txt
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always()
+        with:
+          name: evidence-${{ matrix.name }}
+          path: |
+            artifacts/
+            package-lock.json
+          retention-days: 7
+          if-no-files-found: error
+  tests:
+    name: Tests
+    needs: verify
+    if: always()
+    runs-on: ubuntu-latest
+    permissions: {}
+    steps:
+      - name: Require every compatibility specimen to succeed
+        env:
+          RESULT: ${{ needs.verify.result }}
+        run: test "$RESULT" = success
