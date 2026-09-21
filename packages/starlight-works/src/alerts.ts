@@ -27,6 +27,8 @@ export function resolveAlertLabels(options: AlertOptions = {}): AlertLabels {
 }
 
 function plainText(node: PhrasingContent): string {
+  // Raw tag syntax is not part of the title a screen reader should announce.
+  if (node.type === 'html') return '';
   if ('value' in node) return typeof node.value === 'string' ? node.value : '';
   if ('children' in node) return node.children.map((child) => plainText(child as PhrasingContent)).join('');
   if (node.type === 'image' || node.type === 'imageReference') return node.alt ?? '';

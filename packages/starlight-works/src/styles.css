@@ -1,13 +1,9 @@
 /* Structural defaults inherit the consumer's Starlight typography and theme. */
-.slw-sidebar {
-  --slw-sidebar-indent: 0.75rem;
-  --slw-sidebar-control-size: 2.75rem;
-  min-inline-size: 0;
-}
+.slw-sidebar { min-inline-size: 0; }
 .slw-sidebar .slw-list { list-style: none; padding: 0; margin: 0; min-inline-size: 0; }
 .slw-sidebar .slw-list .slw-list {
   margin-inline-start: 0.25rem;
-  padding-inline-start: var(--slw-sidebar-indent);
+  padding-inline-start: var(--slw-sidebar-indent, 0.75rem);
   border-inline-start: 1px solid var(--slw-sidebar-line, var(--sl-color-hairline-light));
 }
 .slw-sidebar li, .slw-sidebar .slw-group { min-inline-size: 0; overflow-wrap: anywhere; }
@@ -33,11 +29,11 @@
   background: var(--slw-sidebar-current-bg, var(--sl-color-text-accent));
   font-weight: 600;
 }
-.slw-sidebar .slw-category-link { font-weight: 600; min-block-size: var(--slw-sidebar-control-size); }
-.slw-sidebar .slw-group-heading { padding-inline-end: var(--slw-sidebar-control-size); }
+.slw-sidebar .slw-category-link { font-weight: 600; min-block-size: var(--slw-sidebar-control-size, 2.75rem); }
+.slw-sidebar .slw-group-heading { padding-inline-end: var(--slw-sidebar-control-size, 2.75rem); }
 .slw-sidebar summary {
   cursor: pointer;
-  min-block-size: var(--slw-sidebar-control-size);
+  min-block-size: var(--slw-sidebar-control-size, 2.75rem);
   padding: 0.5rem;
   border-radius: 0.25rem;
   color: var(--slw-sidebar-text, var(--sl-color-text));
@@ -49,7 +45,7 @@
   position: absolute;
   inset-block-start: 0;
   inset-inline-end: 0;
-  inline-size: var(--slw-sidebar-control-size);
+  inline-size: var(--slw-sidebar-control-size, 2.75rem);
   text-align: center;
 }
 .slw-sidebar .slw-link:focus-visible, .slw-sidebar summary:focus-visible {
