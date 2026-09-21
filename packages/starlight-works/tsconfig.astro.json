@@ -1,5 +1,5 @@
 {
   "extends": "astro/tsconfigs/strict",
-  "include": ["src/**/*.astro", "src/**/*.ts"],
+  "include": ["src/**/*.astro", "src/**/*.ts", "virtual.d.ts"],
   "compilerOptions": { "skipLibCheck": true }
 }
