@@ -83,7 +83,7 @@ export function transformAlert(node: Readonly<Blockquote>, labels: AlertLabels):
   if (title) caption.push({ type: 'text', value: ' — ' }, title);
   const heading: Paragraph = {
     type: 'paragraph',
-    data: { hProperties: { className: ['slw-alert__title'] } },
+    data: { hProperties: { className: ['slw-alert__title'], 'aria-hidden': 'true' } },
     children: caption,
   };
   return {

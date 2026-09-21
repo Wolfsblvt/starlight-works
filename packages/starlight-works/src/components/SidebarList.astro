@@ -16,7 +16,7 @@ const { entries, path } = Astro.props;
         <div class:list={['slw-group', { 'slw-group--linked': !!view.category }]} data-slw-group={entry.label}>
           {view.category && <div class="slw-group-heading"><SidebarLink entry={view.category} category /></div>}
           <details open={view.open}>
-            <summary aria-label={`Toggle ${entry.label}`} aria-controls={`${id}-children`}>
+            <summary aria-controls={`${id}-children`}>
               {view.category ? <span class="slw-sr-only">{entry.label}</span> : <span class="slw-group-label">{entry.label} {entry.badge && <Badge {...entry.badge} />}</span>}
             </summary>
             <div class="slw-group-panel" id={`${id}-children`}>

@@ -13,12 +13,16 @@ export default defineConfig({
   ...(markdown ? { markdown } : {}),
   integrations: [starlight({
     title: 'Starlight Works fixture',
+    locales: {
+      root: { label: 'English', lang: 'en' },
+      de: { label: 'Deutsch', lang: 'de' },
+    },
     customCss: ['./src/custom.css'],
     plugins: [starlightWorks({
       sidebar: [
         { label: 'Overview', slug: 'index' },
         {
-          label: 'Guide', slug: 'guide', defaultOpen: true,
+          label: 'Guide', slug: 'guide', defaultOpen: true, translations: { de: 'Handbuch' },
           items: [
             { label: 'Start', slug: 'guide/start', badge: { text: 'MDX', variant: 'note' } },
             { label: 'Advanced', slug: 'guide/advanced', defaultOpen: false, items: ['guide/advanced/deep'] },
