@@ -4,9 +4,13 @@ import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 
 export function npm(args, cwd, options = {}) {
-  return execFileSync(process.platform === 'win32' ? 'npm.cmd' : 'npm', args, {
-    cwd, encoding: 'utf8', shell: process.platform === 'win32', ...options,
-  });
+  // npm run supplies its real JavaScript entry on every supported platform.
+  // Avoid a Windows cmd shell, where paths with spaces or metacharacters become commands.
+  const cli = process.env.npm_execpath;
+  const execution = { cwd, encoding: 'utf8', ...options, shell: false };
+  if (cli) return execFileSync(process.execPath, [cli, ...args], execution);
+  if (process.platform === 'win32') throw new Error('Run repository tools through their npm run command so npm can provide its CLI path.');
+  return execFileSync('npm', args, execution);
 }
 export async function pack() {
   const root = fileURLToPath(new URL('../', import.meta.url));

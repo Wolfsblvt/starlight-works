@@ -8,7 +8,7 @@ import { npm } from '../tools/pack.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 test('the actual npm tarball has a complete public surface, no development tree, and reproducible bytes', async () => {
-  const dirs = await Promise.all([1, 2].map(() => mkdtemp(path.join(tmpdir(), 'slw-pack-'))));
+  const dirs = await Promise.all([1, 2].map(() => mkdtemp(path.join(tmpdir(), 'slw pack test '))));
   try {
     const packs = dirs.map((dir) => JSON.parse(npm(['pack', '--workspace=@wolfsblvt/starlight-works', '--ignore-scripts', '--json', '--pack-destination', dir], root))[0]);
     const files = packs[0].files.map((file) => file.path);

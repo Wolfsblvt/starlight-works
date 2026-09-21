@@ -137,6 +137,7 @@ test('wrapped labels do not overlap disclosures or overflow the sidebar in eithe
   expect(toggleBox.height).toBeGreaterThanOrEqual(40);
   const overflow = await page.locator('[data-slw-sidebar]').evaluate((element) => element.scrollWidth > element.clientWidth + 1);
   expect(overflow).toBe(false);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth + 1)).toBe(true);
   const theme = page.locator('starlight-theme-select select').filter({ visible: true }).first();
   const mobile = testInfo.project.name === 'mobile';
   await mkdir('artifacts/screenshots', { recursive: true });
@@ -147,6 +148,7 @@ test('wrapped labels do not overlap disclosures or overflow the sidebar in eithe
     if (mobile) {
       await page.getByRole('button', { name: /menu/i }).click();
       await expect(page.locator('[data-slw-sidebar]')).not.toBeVisible();
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth + 1)).toBe(true);
       await page.screenshot({ path: `artifacts/screenshots/mobile-content-${value}.png`, fullPage: true });
       await menu(page);
     }

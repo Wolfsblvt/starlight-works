@@ -22,7 +22,7 @@ A peer range is an intended compatibility boundary, not evidence that every patc
 
 Every specimen rebuilds the package, runs ordinary tests and Astro component checks, installs the actual tarball into an independent consumer, checks that public TypeScript API, builds the site and runs Chromium browser interactions. The consumer is not a workspace symlink. Both root and non-root base paths are represented.
 
-The workflow's required `Tests` aggregate succeeds only when every specimen succeeds. Consult the exact current-head [PR checks](https://github.com/Wolfsblvt/starlight-works/pull/1/checks) or a dated qualification record for observed standing. This table describes the exercised contract; it does not make an unfinished or failing run green.
+The workflow's required `Tests` aggregate succeeds only when every specimen succeeds. The [2026-09-21 qualification record](qualification/2026-09-21.md) preserves the first green source, exact installed versions, package hashes and observed limits. Consult the exact current-head [PR checks](https://github.com/Wolfsblvt/starlight-works/pull/1/checks) for current standing; a historical successful run does not make a later untested change green.
 
 ## Evidence produced
 
@@ -30,11 +30,11 @@ The run records its checked-out commit, Node/npm versions, selected consumer ver
 
 Browser checks cover distinct anchors and disclosures, keyboard activation and native expanded state, multiple open groups, current ancestors, native link attributes/autogeneration, all five alert meanings, authored titles, rich Markdown, MDX, theme changes and narrow-width overlap/overflow. The no-JavaScript case exercises native navigation/disclosure at a desktop viewport; Starlight's mobile shell retains its own script requirements.
 
-Artifacts are generated evidence with finite provider retention. A screenshot documents one rendered state; the interaction test documents an exercised path. Neither is a substitute for the other.
+Artifacts are generated evidence with finite provider retention. A screenshot documents one rendered state; the interaction test documents an exercised path. Neither is a substitute for the other. The repository currently captures installation locks in those artifacts rather than committing a frozen installation graph. Repeating a fresh install later can select different transitive versions; do not confuse a declared peer range with a guaranteed byte-identical future environment.
 
 ## Material limits
 
-Manual assistive-technology use, Firefox/WebKit, real phones, RTL/multilingual route matrices, server-rendered deployment adapters, arbitrary third-party Sidebar overrides, custom Markdown processors, altered consumer themes and future host versions are not blanket-qualified by this fixture. Build-wide alert label overrides are supported; automatic per-page locale label selection is not implemented.
+Manual assistive-technology use, Firefox/WebKit, real phones, Windows/macOS host execution, RTL/multilingual route matrices, server-rendered deployment adapters, arbitrary third-party Sidebar overrides, custom Markdown processors, altered consumer themes and future host versions are not blanket-qualified by this fixture. Build-wide alert label overrides are supported; automatic per-page locale label selection is not implemented.
 
 No npm publication, registry installation of this package, deployed documentation site, independent review or release acceptance follows from a passing local/CI tarball. The source candidate's contribution has those retained boundaries explicitly.
 
