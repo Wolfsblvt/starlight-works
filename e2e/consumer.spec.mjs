@@ -1,7 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { mkdir } from 'node:fs/promises';
 
-const group = (page, label) => page.locator('[data-slw-group]').filter({ has: page.locator(`:scope > [data-never-present]`) });
 const byGroup = (page, label) => page.locator(`[data-slw-group="${label}"]`);
 const details = (page, label) => byGroup(page, label).locator(':scope > details');
 const disclosure = (page, label) => details(page, label).locator(':scope > summary');
@@ -14,6 +13,28 @@ async function menu(page) {
 async function open(page, path = './') { await page.goto(path); await menu(page); }
 async function expectOpen(page, label, value) {
   await expect.poll(() => details(page, label).evaluate((element) => element.open)).toBe(value);
+}
+
+// Playwright's ARIA-only snapshot does not include Chromium's native DisclosureTriangle.
+// Read the actual accessibility node rather than changing production semantics to fit a test.
+async function nativeDisclosure(page, label) {
+  const session = await page.context().newCDPSession(page);
+  try {
+    const { root } = await session.send('DOM.getDocument');
+    const { nodeId } = await session.send('DOM.querySelector', {
+      nodeId: root.nodeId,
+      selector: `[data-slw-group="${label}"] > details > summary`,
+    });
+    expect(nodeId).not.toBe(0);
+    const { nodes } = await session.send('Accessibility.getPartialAXTree', { nodeId, fetchRelatives: false });
+    const node = nodes.find((value) => !value.ignored);
+    expect(node).toBeDefined();
+    return {
+      role: node.role?.value,
+      name: node.name?.value,
+      properties: Object.fromEntries((node.properties ?? []).map((property) => [property.name, property.value.value])),
+    };
+  } finally { await session.detach(); }
 }
 
 test.beforeEach(async ({ page }) => {
@@ -56,7 +77,7 @@ test('deep current routes override closed defaults without opening unrelated gro
   await expect(page.locator('[data-slw-sidebar]').getByRole('link', { name: 'Deep page', exact: true })).toHaveAttribute('aria-current', 'page');
 });
 
-test('keyboard disclosure and link focus are distinct, with a native expanded state', async ({ page }) => {
+test('keyboard disclosure and link focus are distinct, with a native expanded state', async ({ page }, testInfo) => {
   await open(page);
   const link = byGroup(page, 'Guide').locator(':scope > .slw-group-heading a');
   await link.focus();
@@ -65,10 +86,14 @@ test('keyboard disclosure and link focus are distinct, with a native expanded st
   const initial = page.url();
   await page.keyboard.press('Space');
   await expectOpen(page, 'Guide', false);
+  const collapsed = await nativeDisclosure(page, 'Guide');
+  expect(collapsed).toMatchObject({ role: 'DisclosureTriangle', name: 'Toggle Guide', properties: { expanded: false, focusable: true } });
   await page.keyboard.press('Enter');
   await expectOpen(page, 'Guide', true);
+  const expanded = await nativeDisclosure(page, 'Guide');
+  expect(expanded).toMatchObject({ role: 'DisclosureTriangle', name: 'Toggle Guide', properties: { expanded: true, focusable: true, controls: 'slw-1-children' } });
   expect(page.url()).toBe(initial);
-  await expect(disclosure(page, 'Guide')).toMatchAriaSnapshot('- button "Toggle Guide" [expanded]');
+  await testInfo.attach('native-disclosure-accessibility', { body: JSON.stringify({ collapsed, expanded }, null, 2), contentType: 'application/json' });
 });
 
 test('five alert types retain labels, authored titles and rich Markdown beside normal quotes', async ({ page }) => {
@@ -82,6 +107,8 @@ test('five alert types retain labels, authored titles and rich Markdown beside n
   const note = page.locator('[data-slw-alert="NOTE"]');
   await expect(note).toHaveAttribute('aria-label', 'Note — In development');
   await expect(note.getByRole('link', { name: 'guide' })).toHaveCount(1);
+  const radiusRatio = await note.evaluate((element) => parseFloat(getComputedStyle(element).borderTopLeftRadius) / parseFloat(getComputedStyle(document.documentElement).fontSize));
+  expect(radiusRatio).toBe(0.5);
   const tip = page.locator('[data-slw-alert="TIP"]');
   await expect(tip.locator('li')).toHaveCount(2);
   await expect(tip.locator('pre')).toContainText("const meaning = 'TIP';");
@@ -111,15 +138,22 @@ test('wrapped labels do not overlap disclosures or overflow the sidebar in eithe
   const overflow = await page.locator('[data-slw-sidebar]').evaluate((element) => element.scrollWidth > element.clientWidth + 1);
   expect(overflow).toBe(false);
   const theme = page.locator('starlight-theme-select select').filter({ visible: true }).first();
+  const mobile = testInfo.project.name === 'mobile';
   await mkdir('artifacts/screenshots', { recursive: true });
   for (const value of ['light', 'dark']) {
     await theme.selectOption(value);
     await expect(page.locator('html')).toHaveAttribute('data-theme', value);
-    await page.screenshot({ path: `artifacts/screenshots/${testInfo.project.name}-${value}.png`, fullPage: true });
+    await page.screenshot({ path: `artifacts/screenshots/${testInfo.project.name}-${value}.png`, fullPage: !mobile });
+    if (mobile) {
+      await page.getByRole('button', { name: /menu/i }).click();
+      await expect(page.locator('[data-slw-sidebar]')).not.toBeVisible();
+      await page.screenshot({ path: `artifacts/screenshots/mobile-content-${value}.png`, fullPage: true });
+      await menu(page);
+    }
   }
 });
 
-test('server-rendered navigation and disclosures work without JavaScript', async ({ browser, baseURL }, testInfo) => {
+test('server-rendered navigation and disclosures work without JavaScript', async ({ browser, baseURL }) => {
   const context = await browser.newContext({ javaScriptEnabled: false, viewport: { width: 1440, height: 1000 } });
   try {
     const page = await context.newPage();
