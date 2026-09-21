@@ -1,0 +1,31 @@
+{
+  "name": "starlight-works-repository",
+  "private": true,
+  "type": "module",
+  "workspaces": ["packages/starlight-works"],
+  "engines": { "node": ">=22.12.0" },
+  "scripts": {
+    "build": "node tools/build.mjs",
+    "check": "astro check --root packages/starlight-works --tsconfig tsconfig.astro.json --minimumFailingSeverity error",
+    "test": "npm run build && node --test",
+    "pack": "node tools/pack.mjs",
+    "test:consumer": "node tools/consumer.mjs",
+    "test:browser": "playwright test",
+    "dev": "node tools/serve.mjs dev",
+    "preview": "node tools/serve.mjs preview",
+    "clean:fixture": "node tools/consumer.mjs --clean"
+  },
+  "devDependencies": {
+    "@astrojs/check": "0.9.10",
+    "@astrojs/markdown-remark": "7.3.1",
+    "@astrojs/starlight": "0.42.2",
+    "@playwright/test": "1.63.0",
+    "@types/node": "22.19.17",
+    "astro": "7.3.3",
+    "rehype-stringify": "10.0.1",
+    "remark-parse": "11.0.0",
+    "remark-rehype": "11.1.2",
+    "typescript": "6.0.3",
+    "unified": "11.0.5"
+  }
+}
