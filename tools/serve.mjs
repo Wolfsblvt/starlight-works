@@ -10,7 +10,11 @@ try { state = JSON.parse(await readFile(new URL('../artifacts/consumer.json', im
 catch (error) { throw new Error('Run npm run test:consumer before starting the fixture.', { cause: error }); }
 const root = fileURLToPath(new URL('../', import.meta.url));
 if (await readFile(path.join(state.directory, '.starlight-works-fixture'), 'utf8') !== root) throw new Error('The fixture belongs to another checkout.');
-const child = spawn(process.execPath, [path.join(state.directory, 'node_modules', 'astro', 'astro.js'), mode, '--host', '127.0.0.1', '--port', '4321'], {
+const astroDirectory = path.join(state.directory, 'node_modules', 'astro');
+const manifest = JSON.parse(await readFile(path.join(astroDirectory, 'package.json'), 'utf8'));
+const executable = typeof manifest.bin === 'string' ? manifest.bin : manifest.bin?.astro;
+if (typeof executable !== 'string' || !executable) throw new Error('The installed Astro package does not declare its CLI entry.');
+const child = spawn(process.execPath, [path.resolve(astroDirectory, executable), mode, '--host', '127.0.0.1', '--port', '4321'], {
   cwd: state.directory,
   stdio: 'inherit',
   env: { ...process.env, WORKS_PROCESSOR: state.processor, WORKS_BASE: state.base },
