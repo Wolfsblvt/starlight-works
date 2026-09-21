@@ -6,7 +6,7 @@ Two small extensions for Astro Starlight: category pages that are links next to 
 
 ## Use
 
-This source candidate has not been published to npm. Build the repository and install its generated `.tgz` in your Starlight project; the repository README gives the complete path.
+This source package has not been published to npm. Build the repository and install its generated `.tgz` in your Starlight project; the repository README gives the complete path.
 
 ```js
 import starlight from '@astrojs/starlight';
@@ -35,7 +35,7 @@ Do not also set `starlight.sidebar` or a competing `Sidebar` override. Omit this
 
 ## Compatibility and limits
 
-The candidate targets Starlight `~0.42.2`, Astro `^7.2.10`, and Node `>=22.12.0`. It supports Astro's Satteri and optional Unified processors. Qualification evidence and detailed API/style documentation live in the source repository. It does not promise support for other Starlight minor lines or third-party Markdown processors.
+The package targets Starlight `~0.42.2`, Astro `^7.2.10`, and Node `>=22.12.0`. It supports Astro's Satteri and optional Unified processors. Qualification evidence and detailed API/style documentation live in the source repository. It does not promise support for other Starlight minor lines or third-party Markdown processors.
 
 Native disclosures work without JavaScript. Current ancestry opens on each page render; open states are not persisted across visits. The plugin is not a sanitizer for untrusted Markdown, MDX, HTML, or configuration.
 

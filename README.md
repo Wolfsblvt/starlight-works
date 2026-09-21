@@ -1,14 +1,20 @@
 # starlight-works
 
-[![Distribution: source only](https://img.shields.io/badge/distribution-source_only-555)](#installation) [![Starlight: ~0.42.2](https://img.shields.io/badge/Starlight-~0.42.2-6f42c1)](docs/compatibility.md)
+[![Verification](https://github.com/Wolfsblvt/starlight-works/actions/workflows/verification.yml/badge.svg?branch=main)](https://github.com/Wolfsblvt/starlight-works/actions/workflows/verification.yml) [![Distribution: source only](https://img.shields.io/badge/distribution-source_only-555)](#installation) [![Starlight: ~0.42.2](https://img.shields.io/badge/Starlight-~0.42.2-6f42c1)](docs/compatibility.md)
 
 **A category can be a page and a group. An important note does not have to become a warning.**
 
 `@wolfsblvt/starlight-works` adds two deliberately small capabilities to Astro Starlight: linked sidebar categories with independent disclosures, and all five GitHub Markdown alert types. It inherits your documentation site's typography and theme rather than supplying another product skin.
 
-This is an **unpublished source candidate**, not an npm release. It targets Starlight `~0.42.2`, Astro `^7.2.10` and Node `>=22.12.0`. An open-source project from **Wolfsblvt Works**.
+This is an **unpublished source package**, not an npm release. It targets Starlight `~0.42.2`, Astro `^7.2.10` and Node `>=22.12.0`. An open-source project from **Wolfsblvt Works**.
 
 **[Installation](#installation)** · [Quick start](#quick-start) · [Full API](docs/api.md) · [Compatibility](docs/compatibility.md)
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/assets/readme/package-preview-dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="docs/assets/readme/package-preview-light.svg">
+  <img src="docs/assets/readme/package-preview-light.svg" alt="A Starlight documentation fixture showing linked sidebar categories beside independent disclosures and five distinct GitHub alert types." width="960">
+</picture>
 
 ```js
 starlightWorks({
@@ -26,10 +32,10 @@ The Guide label navigates to the Guide page. Its adjacent disclosure opens or cl
 
 ## Installation
 
-Build a local tarball from the current review branch. These commands do not publish anything:
+Build a local tarball from `main`. These commands do not publish anything:
 
 ```sh
-git clone --branch feat/linked-sidebar-and-alerts https://github.com/Wolfsblvt/starlight-works.git
+git clone https://github.com/Wolfsblvt/starlight-works.git
 cd starlight-works
 npm install
 npm test

@@ -69,6 +69,6 @@ These examples use POSIX environment assignment. In PowerShell, set `$env:WORKS_
 
 ## CI and interpretation
 
-The `Verification` workflow runs on pull requests and the durable `main` push route. It checks the exact PR head, uses read-only repository permissions and pinned Actions, and aggregates all selected specimens into the required `Tests` check. A failure in any specimen fails the aggregate. There is no CI writer, automatic integration, publish, tag or deploy step.
+The `Verification` workflow runs on pull requests and the durable `main` push route. It checks the exact PR head, uses read-only repository permissions and pinned Actions, and aggregates all selected specimens into the `Tests` check. A failure in any specimen fails the aggregate. There is no CI writer, automatic integration, publish, tag or deploy step.
 
 Read the current head's terminal result, not a prior green run. Artifact retention is finite; durable conclusions belong in a dated qualification record, and actionable review belongs with the contribution rather than hidden in documentation. A passing browser test is evidence for its exact browser, viewport, route and build—not blanket accessibility, security or cross-browser certification.

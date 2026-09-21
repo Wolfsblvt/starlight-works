@@ -6,7 +6,7 @@ This document separates starlight-works' declared host contract from the concret
 
 ## Declared contract
 
-The source candidate declares Astro `^7.2.10`, Starlight `~0.42.2`, and Node `>=22.12.0`. Starlight's pre-1.0 minor line is deliberately narrow. The package uses its public plugin, Sidebar override, component and route-data surfaces rather than importing its internal sidebar generator.
+The package declares Astro `^7.2.10`, Starlight `~0.42.2`, and Node `>=22.12.0`. Starlight's pre-1.0 minor line is deliberately narrow. The package uses its public plugin, Sidebar override, component and route-data surfaces rather than importing its internal sidebar generator.
 
 Astro 7's default Satteri processor and the optional Unified processor from `@astrojs/markdown-remark` are supported. The optional peer is `^7.3.0`; Satteri hosts do not need to install Unified merely for this plugin. Another processor can use only the sidebar by setting `alerts: false`.
 
@@ -22,7 +22,7 @@ A peer range is an intended compatibility boundary, not evidence that every patc
 
 Every specimen rebuilds the package, runs ordinary tests and Astro component checks, installs the actual tarball into an independent consumer, checks that public TypeScript API, builds the site and runs Chromium browser interactions. The consumer is not a workspace symlink. Both root and non-root base paths are represented.
 
-The workflow's required `Tests` aggregate succeeds only when every specimen succeeds. The [2026-09-21 qualification record](qualification/2026-09-21.md) preserves the first green source, exact installed versions, package hashes and observed limits. Consult the exact current-head [PR checks](https://github.com/Wolfsblvt/starlight-works/pull/1/checks) for current standing; a historical successful run does not make a later untested change green.
+The workflow's `Tests` aggregate succeeds only when every specimen succeeds. The [2026-09-21 qualification record](qualification/2026-09-21.md) preserves the first green source, exact installed versions, package hashes and observed limits. Consult the current [Verification workflow](https://github.com/Wolfsblvt/starlight-works/actions/workflows/verification.yml) for hosted standing; a historical successful run does not make a later untested change green.
 
 ## Evidence produced
 
@@ -36,7 +36,7 @@ Artifacts are generated evidence with finite provider retention. A screenshot do
 
 Manual assistive-technology use, Firefox/WebKit, real phones, Windows/macOS host execution, RTL/multilingual route matrices, server-rendered deployment adapters, arbitrary third-party Sidebar overrides, custom Markdown processors, altered consumer themes and future host versions are not blanket-qualified by this fixture. Build-wide alert label overrides are supported; automatic per-page locale label selection is not implemented.
 
-No npm publication, registry installation of this package, deployed documentation site, independent review or release acceptance follows from a passing local/CI tarball. The source candidate's contribution has those retained boundaries explicitly.
+No npm publication, registry installation of this package, deployed documentation site, independent review or release acceptance follows from a passing local/CI tarball. The source contribution retains those boundaries explicitly.
 
 ## Primary contracts
 
